@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jana's Meal Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:            #F5F0E8;
+  --card:          #FEFCF8;
+  --text:          #1E1810;
+  --text-2:        #7A6E62;
+  --text-3:        #B0A496;
+  --accent:        #B8521E;
+  --accent-light:  #FBE9DE;
+  --accent-hover:  #9E4418;
+  --green:         #3A6648;
+  --green-light:   #E6F0E9;
+  --blue:          #2B5E78;
+  --blue-light:    #E1EEF5;
+  --border:        #E4DDD2;
+  --shadow:        0 2px 20px rgba(30, 24, 16, 0.07);
+  --shadow-sm:     0 1px 6px rgba(30, 24, 16, 0.06);
+
+  /* tag colours */
+  --tag-meat-bg:   #F2E4D4;  --tag-meat-fg:   #7A3A14;
+  --tag-fish-bg:   #D4E4F2;  --tag-fish-fg:   #1A4A6A;
+  --tag-plant-bg:  #D4EBD8;  --tag-plant-fg:  #1E5A30;
+  --tag-egg-bg:    #F2EBCC;  --tag-egg-fg:    #6A5008;
+}
+
+/* ── Base ── */
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* warm radial glow behind the page */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 10%, rgba(184,82,30,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 85% 85%, rgba(58,102,72,0.05) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Header ── */
+header {
+  text-align: center;
+  margin-bottom: 36px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  font-family: 'Fraunces', serif;
+  font-size: 2.4rem;
+  font-weight: 300;
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+  color: var(--text);
+  line-height: 1.15;
+}
+
+header h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+header p {
+  color: var(--text-2);
+  font-size: 0.88rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Macro Summary ── */
+.macro-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.macro-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 12px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.macro-box:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.macro-box .value {
+  font-family: 'Fraunces', serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  font-optical-sizing: auto;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.macro-box .label {
+  font-size: 0.75rem;
+  color: var(--text-2);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* ── Tabs ── */
+.tabs-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 5px;
+  display: flex;
+  gap: 3px;
+  margin-bottom: 28px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.tabs-wrap::-webkit-scrollbar { display: none; }
+
+.tab {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  border-radius: 50px;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s ease, background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.tab:hover { color: var(--text); }
+
+.tab.active {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(184, 82, 30, 0.35);
+}
+
+.tab.shop-tab.active,
+.tab.prep-tab.active {
+  background: var(--text);
+  box-shadow: 0 2px 8px rgba(30,24,16,0.25);
+}
+
+/* ── Content animation ── */
+.tab-content {
+  animation: pageIn 0.22s ease;
+}
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Day Cards ── */
+.day-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  margin-bottom: 18px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(184,82,30,0.04) 0%, transparent 60%);
+}
+
+.day-name {
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+}
+
+.day-macros {
+  font-size: 0.78rem;
+  color: var(--text-2);
+  font-weight: 400;
+}
+
+/* ── Meal ── */
+.meal {
+  padding: 18px 24px;
+  border-bottom: 1px solid #f0ebe2;
+}
+
+.meal:last-child { border-bottom: none; }
+
+.meal-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 5px;
+}
+
+.meal-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  font-weight: 400;
+  font-optical-sizing: auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 9px;
+  line-height: 1.3;
+}
+
+/* ── Tags ── */
+.tag {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 50px;
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+
+.tag-meat  { background: var(--tag-meat-bg);  color: var(--tag-meat-fg); }
+.tag-fish  { background: var(--tag-fish-bg);  color: var(--tag-fish-fg); }
+.tag-plant { background: var(--tag-plant-bg); color: var(--tag-plant-fg); }
+.tag-egg   { background: var(--tag-egg-bg);   color: var(--tag-egg-fg); }
+
+/* ── Meal Macros ── */
+.meal-macros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: 0.8rem;
+  color: var(--text-2);
+  margin-bottom: 12px;
+}
+
+.meal-macros strong { color: var(--text); font-weight: 600; }
+
+/* ── Toggle Button ── */
+.ingredients-toggle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-light);
+  border: none;
+  border-radius: 50px;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ingredients-toggle:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── Recipe Detail ── */
+.recipe-detail {
+  margin-top: 14px;
+  padding-top: 16px;
+  border-top: 1px solid #f0ebe2;
+  animation: recipeIn 0.2s ease;
+}
+
+@keyframes recipeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.recipe-detail h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+  font-optical-sizing: auto;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin-bottom: 8px;
+  margin-top: 14px;
+}
+
+.recipe-detail h4:first-child { margin-top: 0; }
+
+.recipe-detail ul,
+.recipe-detail ol {
+  padding-left: 18px;
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.65;
+}
+
+.recipe-detail li { margin-bottom: 4px; }
+
+.prep-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--blue);
+  background: var(--blue-light);
+  border-radius: 50px;
+  padding: 4px 11px;
+}
+
+/* ── Tip Note ── */
+.note {
+  background: var(--accent-light);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 12px 12px 0;
+  padding: 14px 18px;
+  font-size: 0.84rem;
+  color: var(--accent);
+  margin-top: 20px;
+  line-height: 1.6;
+}
+
+/* ── Shopping List ── */
+.shop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.shop-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 300;
+  font-optical-sizing: auto;
+}
+
+.clear-btn {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-2);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.clear-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.shop-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 22px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.shop-section h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  font-weight: 400;
+  font-optical-sizing: auto;
+  margin-bottom: 14px;
+  color: var(--text);
+}
+
+.shop-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0ebe2;
+  font-size: 0.875rem;
+}
+
+.shop-item:last-child { border-bottom: none; }
+
+/* custom checkbox */
+.shop-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s, background 0.15s;
+  position: relative;
+}
+
+.shop-item input[type="checkbox"]:hover {
+  border-color: var(--green);
+}
+
+.shop-item input[type="checkbox"]:checked {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.shop-item input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 6px;
+  width: 5px;
+  height: 9px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+.shop-item.checked label {
+  text-decoration: line-through;
+  color: var(--text-3);
+}
+
+.shop-item label {
+  cursor: pointer;
+  flex: 1;
+  transition: color 0.2s;
+}
+
+.shop-item .qty {
+  color: var(--text-3);
+  font-size: 0.78rem;
+  font-weight: 500;
+  min-width: 90px;
+  text-align: right;
+}
+
+/* ── Batch Prep ── */
+.prep-header {
+  margin-bottom: 20px;
+}
+
+.prep-header h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 300;
+  font-optical-sizing: auto;
+  margin-bottom: 4px;
+}
+
+.prep-header p {
+  font-size: 0.83rem;
+  color: var(--text-2);
+}
+
+.prep-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 22px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.prep-step {
+  display: flex;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0ebe2;
+}
+
+.prep-step:last-child { border-bottom: none; }
+
+.prep-number {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--blue-light);
+  color: var(--blue);
+  font-weight: 700;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.prep-content h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 3px;
+  color: var(--text);
+}
+
+.prep-content p {
+  font-size: 0.84rem;
+  color: var(--text-2);
+  line-height: 1.55;
+  margin-bottom: 4px;
+}
+
+.prep-time-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.73rem;
+  font-weight: 500;
+  color: var(--blue);
+  background: var(--blue-light);
+  border-radius: 50px;
+  padding: 3px 10px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .macro-summary { grid-template-columns: repeat(2, 1fr); }
+  .container { padding: 18px 14px 50px; }
+  header h1 { font-size: 1.8rem; }
+  .day-header { flex-direction: column; gap: 3px; }
+  .meal { padding: 14px 16px; }
+  .day-header { padding: 14px 16px 12px; }
+  .shop-section, .prep-card { padding: 16px; }
+  .tab { padding: 7px 11px; font-size: 0.78rem; }
+}
+</style>
+</head>
+<body>
+<div class="container" id="app"></div>
+
+<script src="recipes.js"></script>
+<script>
+// ── State ──────────────────────────────────────────────────────
+let activeTab = 0;
+let expandedMeals = {};
+let checkedItems = JSON.parse(localStorage.getItem('jana-checked') || '{}');
+
+// ── Helpers ───────────────────────────────────────────────────
+function setTab(i)        { activeTab = i; render(); }
+function toggleMeal(key)  { expandedMeals[key] = !expandedMeals[key]; render(); }
+
+function toggleCheck(key) {
+  checkedItems[key] = !checkedItems[key];
+  if (!checkedItems[key]) delete checkedItems[key];
+  localStorage.setItem('jana-checked', JSON.stringify(checkedItems));
+  render();
+}
+
+function clearAll() {
+  checkedItems = {};
+  localStorage.removeItem('jana-checked');
+  render();
+}
+
+// ── Render ────────────────────────────────────────────────────
+function render() {
+  const app = document.getElementById('app');
+
+  const avgCal = Math.round(mealPlan.reduce((s, d) => s + d.totalCal, 0) / 7);
+  const avgP   = Math.round(mealPlan.reduce((s, d) => s + d.totalP,   0) / 7);
+  const avgF   = Math.round(mealPlan.reduce((s, d) => s + d.totalF,   0) / 7);
+  const avgC   = Math.round(mealPlan.reduce((s, d) => s + d.totalC,   0) / 7);
+
+  const tabLabels = ['All Days', ...mealPlan.map(d => d.day.slice(0, 3)), '🛒 Shop', '📋 Prep'];
+  const shopIdx = tabLabels.length - 2;
+  const prepIdx = tabLabels.length - 1;
+
+  let html = `
+    <header>
+      <h1><em>Jana's</em> Weekly Meal Plan</h1>
+      <p>Gluten-free &middot; Dairy-free &middot; High protein &middot; ~1300 kcal lunch + dinner</p>
+    </header>
+
+    <div class="macro-summary">
+      <div class="macro-box"><div class="value">${avgCal}</div><div class="label">Avg kcal</div></div>
+      <div class="macro-box"><div class="value">${avgP}g</div><div class="label">Protein</div></div>
+      <div class="macro-box"><div class="value">${avgF}g</div><div class="label">Fat</div></div>
+      <div class="macro-box"><div class="value">${avgC}g</div><div class="label">Carbs</div></div>
+    </div>
+
+    <div class="tabs-wrap">
+  `;
+
+  tabLabels.forEach((label, i) => {
+    const extra = label === '🛒 Shop' ? ' shop-tab' : label === '📋 Prep' ? ' prep-tab' : '';
+    html += `<button class="tab${extra}${i === activeTab ? ' active' : ''}" onclick="setTab(${i})">${label}</button>`;
+  });
+
+  html += `</div><div class="tab-content">`;
+
+  if (activeTab === shopIdx) {
+    html += renderShoppingList();
+  } else if (activeTab === prepIdx) {
+    html += renderBatchPrep();
+  } else {
+    const days = activeTab === 0 ? mealPlan : [mealPlan[activeTab - 1]];
+    days.forEach((day, idx) => {
+      const realIdx = activeTab === 0 ? idx : activeTab - 1;
+      html += `
+        <div class="day-card">
+          <div class="day-header">
+            <div class="day-name">${day.day}</div>
+            <div class="day-macros">${day.totalCal} kcal &middot; ${day.totalP}g P &middot; ${day.totalF}g F &middot; ${day.totalC}g C</div>
+          </div>
+      `;
+      day.meals.forEach((meal, mealIdx) => {
+        const key = `${realIdx}-${mealIdx}`;
+        const expanded = expandedMeals[key];
+        html += `
+          <div class="meal">
+            <div class="meal-label">${meal.label}</div>
+            <div class="meal-title">
+              ${meal.title}
+              <span class="tag tag-${meal.tag}">${meal.tagLabel}</span>
+            </div>
+            <div class="meal-macros">
+              <span><strong>${meal.cal}</strong> kcal</span>
+              <span><strong>${meal.protein}g</strong> protein</span>
+              <span><strong>${meal.fat}g</strong> fat</span>
+              <span><strong>${meal.carbs}g</strong> carbs</span>
+            </div>
+            <button class="ingredients-toggle" onclick="toggleMeal('${key}')">
+              ${expanded ? '▾ Hide recipe' : '▸ Show recipe'}
+            </button>
+        `;
+        if (expanded) {
+          html += `
+            <div class="recipe-detail">
+              <h4>Ingredients</h4>
+              <ul>${meal.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
+              <h4>Method</h4>
+              <ol>${meal.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+              <div class="prep-time">⏱ ${meal.time}</div>
+            </div>
+          `;
+        }
+        html += `</div>`;
+      });
+      html += `</div>`;
+    });
+
+    if (activeTab === 0) {
+      html += `<div class="note">💡 <strong>Tip:</strong> On a ~1300 kcal lunch+dinner plan, protein averages ~100g from meals. If Jana trains regularly, consider adding a protein shake at breakfast (25–30g) to push daily total above 120g.</div>`;
+    }
+  }
+
+  html += `</div>`;
+  app.innerHTML = html;
+}
+
+function renderShoppingList() {
+  const anyChecked = Object.values(checkedItems).some(Boolean);
+  let html = `
+    <div class="shop-header">
+      <div class="shop-title">Shopping List</div>
+      ${anyChecked ? `<button class="clear-btn" onclick="clearAll()">Clear all</button>` : ''}
+    </div>
+  `;
+
+  Object.entries(shoppingList).forEach(([category, items]) => {
+    html += `<div class="shop-section"><h3>${category}</h3>`;
+    items.forEach((item, i) => {
+      const key = `${category}-${i}`;
+      const checked = !!checkedItems[key];
+      html += `
+        <div class="shop-item ${checked ? 'checked' : ''}">
+          <input type="checkbox" id="${key}" ${checked ? 'checked' : ''} onchange="toggleCheck('${key}')">
+          <label for="${key}">${item.name}</label>
+          <span class="qty">${item.qty}</span>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  });
+
+  return html;
+}
+
+function renderBatchPrep() {
+  let html = `
+    <div class="prep-header">
+      <h2>Sunday Batch Prep</h2>
+      <p>~1 hour total &middot; Do steps 3, 4 &amp; 7 simultaneously in the oven</p>
+    </div>
+    <div class="prep-card">
+  `;
+
+  batchPrep.forEach((step, i) => {
+    html += `
+      <div class="prep-step">
+        <div class="prep-number">${i + 1}</div>
+        <div class="prep-content">
+          <h4>${step.title}</h4>
+          <p>${step.desc}</p>
+          <span class="prep-time-badge">⏱ ${step.time}</span>
+        </div>
+      </div>
+    `;
+  });
+
+  html += `
+    </div>
+    <div class="note">
+      💡 <strong>Storage:</strong> Everything keeps for 4–5 days in the fridge. Use Mon–Wed prepped items fresh; from Thursday onwards you may want to freeze meatballs and extra chicken portions.
+    </div>
+  `;
+
+  return html;
+}
+
+render();
+</script>
+</body>
+</html>

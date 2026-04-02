@@ -631,6 +631,8 @@ const translations = {
     subtitle: 'Gluten-free · Dairy-free · High protein · ~1300 kcal/day',
     avgKcal: 'Avg kcal', protein: 'Protein', fat: 'Fat', carbs: 'Carbs',
     allDays: 'All Days',
+    shopTab: '🛒 Shop',
+    prepTab: '📋 Prep',
     dayShort: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
     dayFull:  ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
     lunch: 'Lunch', dinner: 'Dinner',
@@ -639,11 +641,18 @@ const translations = {
     swap: '🔀 Swap',
     ingredients: 'Ingredients', method: 'Method',
     shopTitle: "This Week's Shopping", clearAll: 'Clear all',
+    checkStock: 'check stock',
     prepTitle: 'Sunday Batch Prep',
     prepSub: "Steps tailored to this week's recipes · Do oven steps simultaneously",
     prepEmpty: "No batch prep needed for this week's plan.",
     tipPlan:    'Plan refreshes every Monday. Use the 🔀 swap buttons on any dinner to get a different recipe for that day — your swaps are saved for the week.',
     tipStorage: 'Everything keeps 4–5 days in the fridge. Cook dinner fresh each night, pack the leftovers straight away for the next day\'s lunch.',
+    units: {
+      cloves: 'cloves',
+      stalks: 'stalks',
+      slices: 'slices',
+      tbsp: 'tbsp'
+    },
     cats: {
       proteins:   '🥩 Proteins',
       vegetables: '🥬 Vegetables & Herbs',
@@ -658,6 +667,8 @@ const translations = {
     subtitle: 'Glutenfrei · Milchfrei · Proteinreich · ~1300 kcal/Tag',
     avgKcal: 'Ø kcal', protein: 'Eiweiß', fat: 'Fett', carbs: 'KH',
     allDays: 'Alle Tage',
+    shopTab: '🛒 Einkauf',
+    prepTab: '📋 Vorbereitung',
     dayShort: ['Mo','Di','Mi','Do','Fr','Sa','So'],
     dayFull:  ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'],
     lunch: 'Mittagessen', dinner: 'Abendessen',
@@ -666,11 +677,18 @@ const translations = {
     swap: '🔀 Tauschen',
     ingredients: 'Zutaten', method: 'Zubereitung',
     shopTitle: 'Einkaufsliste diese Woche', clearAll: 'Alle löschen',
+    checkStock: 'Vorrat prüfen',
     prepTitle: 'Sonntagsvorbereitung',
     prepSub: 'Auf diese Woche abgestimmt · Ofengerichte gleichzeitig zubereiten',
     prepEmpty: 'Keine Vorbereitungen für diese Woche nötig.',
     tipPlan:    'Der Plan wird jeden Montag aktualisiert. Mit 🔀 kann jedes Abendessen einzeln getauscht werden — Änderungen bleiben die ganze Woche gespeichert.',
     tipStorage: 'Alles hält 4–5 Tage im Kühlschrank. Abendessen frisch kochen und die Reste direkt für das nächste Mittagessen einpacken.',
+    units: {
+      cloves: 'Zehen',
+      stalks: 'Stangen',
+      slices: 'Scheiben',
+      tbsp: 'EL'
+    },
     cats: {
       proteins:   '🥩 Proteine',
       vegetables: '🥬 Gemüse & Kräuter',
@@ -692,6 +710,20 @@ function setLang(l) {
   localStorage.setItem('jana-lang', l);
   document.documentElement.lang = translations[l].htmlLang;
   render();
+}
+
+function localizedField(obj, key) {
+  if (lang === 'de' && obj?.[`${key}_de`]) return obj[`${key}_de`];
+  return obj?.[key];
+}
+
+function localizedTimeLabel(time) {
+  if (lang !== 'de' || !time) return time;
+  return time
+    .replace('(prepped)', '(vorbereitet)')
+    .replace('(passive)', '(passiv)')
+    .replace(/\bprep\b/g, 'Vorb.')
+    .replace(/\boven\b/g, 'Ofen');
 }
 
 // ── Week helpers ───────────────────────────────────────────────
@@ -840,14 +872,14 @@ function generateShoppingList(recipes) {
 }
 
 function fmtQty(item) {
-  if (item.isStock) return 'check stock';
+  if (item.isStock) return t('checkStock');
   const q = item.total, u = item.unit;
   if (u === 'g' || u === 'ml') return `${q}${u}`;
   if (u === 'whole')  return `× ${Math.ceil(q)}`;
-  if (u === 'cloves') return `${q} cloves`;
-  if (u === 'stalks') return `${q} stalks`;
-  if (u === 'slices') return `${q} slices`;
-  if (u === 'tbsp')   return `${q} tbsp`;
+  if (u === 'cloves') return `${q} ${t('units').cloves}`;
+  if (u === 'stalks') return `${q} ${t('units').stalks}`;
+  if (u === 'slices') return `${q} ${t('units').slices}`;
+  if (u === 'tbsp')   return `${q} ${t('units').tbsp}`;
   return `${q} ${u}`;
 }
 
@@ -892,6 +924,7 @@ function clearAll() {
 // ── Render ────────────────────────────────────────────────────
 function render() {
   const app = document.getElementById('app');
+  document.documentElement.lang = translations[lang].htmlLang;
 
   const plan = getActivePlan(); // 7 recipes — these are the dinners (Mon–Sun)
   const days = t('dayFull');
@@ -934,12 +967,12 @@ function render() {
     <div class="tabs-wrap">
   `;
 
-  const tabLabels = [t('allDays'), ...t('dayShort'), '🛒 Shop', '📋 Prep'];
+  const tabLabels = [t('allDays'), ...t('dayShort'), t('shopTab'), t('prepTab')];
   const shopIdx = tabLabels.length - 2;
   const prepIdx = tabLabels.length - 1;
 
   tabLabels.forEach((label, i) => {
-    const extra = label === '🛒 Shop' ? ' shop-tab' : label === '📋 Prep' ? ' prep-tab' : '';
+    const extra = i === shopIdx ? ' shop-tab' : i === prepIdx ? ' prep-tab' : '';
     html += `<button class="tab${extra}${i === activeTab ? ' active' : ''}" onclick="setTab(${i})">${label}</button>`;
   });
 
@@ -989,8 +1022,8 @@ function renderDayCard(dayData, dayIdx) {
     <div class="meal meal--leftover">
       <div class="meal-label">${t('lunch')} &middot; ${t('lunchSub')}</div>
       <div class="meal-title">
-        ${lunch.title}
-        <span class="tag tag-${lunch.tag}">${lunch.tagLabel}</span>
+        ${localizedField(lunch, 'title')}
+        <span class="tag tag-${lunch.tag}">${localizedField(lunch, 'tagLabel')}</span>
       </div>
       <div class="meal-macros">
         <span><strong>${lunch.cal}</strong> kcal</span>
@@ -1014,8 +1047,8 @@ function renderDayCard(dayData, dayIdx) {
     <div class="meal">
       <div class="meal-label">${t('dinner')} &middot; ${t('dinnerSub')}</div>
       <div class="meal-title">
-        ${dinner.title}
-        <span class="tag tag-${dinner.tag}">${dinner.tagLabel}</span>
+        ${localizedField(dinner, 'title')}
+        <span class="tag tag-${dinner.tag}">${localizedField(dinner, 'tagLabel')}</span>
       </div>
       <div class="meal-macros">
         <span><strong>${dinner.cal}</strong> kcal</span>
@@ -1041,10 +1074,10 @@ function recipeDetail(recipe) {
   return `
     <div class="recipe-detail">
       <h4>${t('ingredients')}</h4>
-      <ul>${recipe.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
+      <ul>${localizedField(recipe, 'ingredients').map(i => `<li>${i}</li>`).join('')}</ul>
       <h4>${t('method')}</h4>
-      <ol>${recipe.steps.map(s => `<li>${s}</li>`).join('')}</ol>
-      <div class="prep-time">⏱ ${recipe.time}</div>
+      <ol>${localizedField(recipe, 'steps').map(s => `<li>${s}</li>`).join('')}</ol>
+      <div class="prep-time">⏱ ${localizedTimeLabel(localizedField(recipe, 'time'))}</div>
     </div>
   `;
 }
@@ -1098,9 +1131,9 @@ function renderBatchPrep(plan) {
         <div class="prep-step">
           <div class="prep-number">${i + 1}</div>
           <div class="prep-content">
-            <h4>${step.title}</h4>
-            <p>${step.desc}</p>
-            <span class="prep-time-badge">⏱ ${step.time}</span>
+            <h4>${localizedField(step, 'title')}</h4>
+            <p>${localizedField(step, 'desc')}</p>
+            <span class="prep-time-badge">⏱ ${localizedTimeLabel(localizedField(step, 'time'))}</span>
           </div>
         </div>
       `;

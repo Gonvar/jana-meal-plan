@@ -18,7 +18,6 @@
   --text-3:        #B0A496;
   --accent:        #B8521E;
   --accent-light:  #FBE9DE;
-  --accent-hover:  #9E4418;
   --green:         #3A6648;
   --green-light:   #E6F0E9;
   --blue:          #2B5E78;
@@ -27,14 +26,12 @@
   --shadow:        0 2px 20px rgba(30, 24, 16, 0.07);
   --shadow-sm:     0 1px 6px rgba(30, 24, 16, 0.06);
 
-  /* tag colours */
   --tag-meat-bg:   #F2E4D4;  --tag-meat-fg:   #7A3A14;
   --tag-fish-bg:   #D4E4F2;  --tag-fish-fg:   #1A4A6A;
   --tag-plant-bg:  #D4EBD8;  --tag-plant-fg:  #1E5A30;
   --tag-egg-bg:    #F2EBCC;  --tag-egg-fg:    #6A5008;
 }
 
-/* ── Base ── */
 body {
   font-family: 'Outfit', sans-serif;
   background: var(--bg);
@@ -43,7 +40,6 @@ body {
   min-height: 100vh;
 }
 
-/* warm radial glow behind the page */
 body::before {
   content: '';
   position: fixed;
@@ -78,7 +74,6 @@ header h1 {
   font-optical-sizing: auto;
   letter-spacing: -0.01em;
   margin-bottom: 8px;
-  color: var(--text);
   line-height: 1.15;
 }
 
@@ -93,6 +88,20 @@ header p {
   font-weight: 400;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.week-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-2);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 4px 12px;
 }
 
 /* ── Macro Summary ── */
@@ -113,10 +122,7 @@ header p {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.macro-box:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow);
-}
+.macro-box:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
 
 .macro-box .value {
   font-family: 'Fraunces', serif;
@@ -184,9 +190,7 @@ header p {
 }
 
 /* ── Content animation ── */
-.tab-content {
-  animation: pageIn 0.22s ease;
-}
+.tab-content { animation: pageIn 0.22s ease; }
 
 @keyframes pageIn {
   from { opacity: 0; transform: translateY(8px); }
@@ -223,7 +227,6 @@ header p {
 .day-macros {
   font-size: 0.78rem;
   color: var(--text-2);
-  font-weight: 400;
 }
 
 /* ── Meal ── */
@@ -233,6 +236,19 @@ header p {
 }
 
 .meal:last-child { border-bottom: none; }
+
+/* Leftover lunch style */
+.meal--leftover {
+  background: rgba(176, 164, 150, 0.03);
+}
+
+.meal--leftover .meal-label {
+  color: var(--text-3);
+}
+
+.meal--leftover .meal-title {
+  color: var(--text-2);
+}
 
 .meal-label {
   font-size: 0.68rem;
@@ -285,7 +301,14 @@ header p {
 
 .meal-macros strong { color: var(--text); font-weight: 600; }
 
-/* ── Toggle Button ── */
+/* ── Meal actions row ── */
+.meal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .ingredients-toggle {
   font-family: 'Outfit', sans-serif;
   font-size: 0.78rem;
@@ -302,6 +325,24 @@ header p {
 .ingredients-toggle:hover {
   background: var(--accent);
   color: #fff;
+}
+
+.swap-btn {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-2);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.swap-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* ── Recipe Detail ── */
@@ -354,7 +395,7 @@ header p {
   padding: 4px 11px;
 }
 
-/* ── Tip Note ── */
+/* ── Note ── */
 .note {
   background: var(--accent-light);
   border-left: 3px solid var(--accent);
@@ -394,10 +435,7 @@ header p {
   transition: border-color 0.15s, color 0.15s;
 }
 
-.clear-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
+.clear-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 .shop-section {
   background: var(--card);
@@ -428,7 +466,6 @@ header p {
 
 .shop-item:last-child { border-bottom: none; }
 
-/* custom checkbox */
 .shop-item input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
@@ -443,9 +480,7 @@ header p {
   position: relative;
 }
 
-.shop-item input[type="checkbox"]:hover {
-  border-color: var(--green);
-}
+.shop-item input[type="checkbox"]:hover { border-color: var(--green); }
 
 .shop-item input[type="checkbox"]:checked {
   background: var(--green);
@@ -470,24 +505,18 @@ header p {
   color: var(--text-3);
 }
 
-.shop-item label {
-  cursor: pointer;
-  flex: 1;
-  transition: color 0.2s;
-}
+.shop-item label { cursor: pointer; flex: 1; transition: color 0.2s; }
 
 .shop-item .qty {
   color: var(--text-3);
   font-size: 0.78rem;
   font-weight: 500;
-  min-width: 90px;
+  min-width: 80px;
   text-align: right;
 }
 
 /* ── Batch Prep ── */
-.prep-header {
-  margin-bottom: 20px;
-}
+.prep-header { margin-bottom: 20px; }
 
 .prep-header h2 {
   font-family: 'Fraunces', serif;
@@ -497,10 +526,7 @@ header p {
   margin-bottom: 4px;
 }
 
-.prep-header p {
-  font-size: 0.83rem;
-  color: var(--text-2);
-}
+.prep-header p { font-size: 0.83rem; color: var(--text-2); }
 
 .prep-card {
   background: var(--card);
@@ -535,19 +561,8 @@ header p {
   margin-top: 1px;
 }
 
-.prep-content h4 {
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 3px;
-  color: var(--text);
-}
-
-.prep-content p {
-  font-size: 0.84rem;
-  color: var(--text-2);
-  line-height: 1.55;
-  margin-bottom: 4px;
-}
+.prep-content h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 3px; }
+.prep-content p  { font-size: 0.84rem; color: var(--text-2); line-height: 1.55; margin-bottom: 4px; }
 
 .prep-time-badge {
   display: inline-flex;
@@ -579,14 +594,185 @@ header p {
 
 <script src="recipes.js"></script>
 <script>
+// ── Week helpers ───────────────────────────────────────────────
+function getWeekSeed() {
+  const d = new Date();
+  const jan1 = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+  return d.getFullYear() * 100 + week;
+}
+
+function getWeekLabel() {
+  const d = new Date();
+  const monday = new Date(d);
+  const day = d.getDay() || 7;
+  monday.setDate(d.getDate() - day + 1);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  const fmt = dt => dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return `${fmt(monday)} – ${fmt(sunday)}`;
+}
+
+// ── Seeded PRNG (mulberry32) ───────────────────────────────────
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// ── Plan generation ───────────────────────────────────────────
+function generateWeekPlan(seed) {
+  const rng = mulberry32(seed);
+
+  // Fisher-Yates shuffle a copy of the pool
+  const pool = [...recipePool];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+
+  // Greedy pick 7 with tag balance (max 2 per tag, ≥1 fish, ≥1 plant)
+  const tagCounts = {};
+  const selected = [];
+
+  for (const recipe of pool) {
+    if (selected.length === 7) break;
+    const count = tagCounts[recipe.tag] || 0;
+    if (count >= 2) continue;
+
+    // If we're on the last 1-2 slots and still missing fish or plant, enforce it
+    const slotsLeft = 7 - selected.length;
+    const hasFish  = selected.some(r => r.tag === 'fish');
+    const hasPlant = selected.some(r => r.tag === 'plant');
+
+    if (slotsLeft === 1 && !hasFish  && recipe.tag !== 'fish')  continue;
+    if (slotsLeft === 1 && !hasPlant && recipe.tag !== 'plant') continue;
+    if (slotsLeft === 2 && !hasFish  && !hasPlant && recipe.tag === 'meat') continue;
+
+    tagCounts[recipe.tag] = count + 1;
+    selected.push(recipe);
+  }
+
+  // Fallback: fill any remaining slots ignoring constraints
+  if (selected.length < 7) {
+    const usedIds = new Set(selected.map(r => r.id));
+    for (const recipe of pool) {
+      if (selected.length === 7) break;
+      if (!usedIds.has(recipe.id)) selected.push(recipe);
+    }
+  }
+
+  return selected.map(r => r.id);
+}
+
+function getActivePlan() {
+  const seed = getWeekSeed();
+  const swapsKey = `jana-swaps-${seed}`;
+  const baseIds = generateWeekPlan(seed);
+  const swaps = JSON.parse(localStorage.getItem(swapsKey) || '{}');
+
+  // Clean up stale swap data from old weeks
+  for (const k of Object.keys(localStorage)) {
+    if (k.startsWith('jana-swaps-') && k !== swapsKey) localStorage.removeItem(k);
+  }
+
+  return baseIds.map((id, i) => {
+    const overrideId = swaps[String(i)];
+    return recipePool.find(r => r.id === (overrideId || id))
+        || recipePool.find(r => r.id === id);
+  });
+}
+
+// ── Swap ──────────────────────────────────────────────────────
+function swapMeal(dayIndex) {
+  const seed = getWeekSeed();
+  const current = getActivePlan();
+  const usedIds = new Set(current.map(r => r.id));
+  const cur = current[dayIndex];
+
+  // Prefer same tag; fall back to any unused recipe
+  let candidates = recipePool.filter(r => !usedIds.has(r.id) && r.tag === cur.tag);
+  if (!candidates.length) candidates = recipePool.filter(r => !usedIds.has(r.id));
+  if (!candidates.length) return;
+
+  // Use a mix of stable seed + time so each click gives a different recipe
+  const pick = candidates[Math.floor(
+    mulberry32(seed ^ (dayIndex * 0xDEAD) ^ (Date.now() & 0xFFFF))() * candidates.length
+  )];
+
+  const swapsKey = `jana-swaps-${seed}`;
+  const swaps = JSON.parse(localStorage.getItem(swapsKey) || '{}');
+  swaps[String(dayIndex)] = pick.id;
+  localStorage.setItem(swapsKey, JSON.stringify(swaps));
+  render();
+}
+
+// ── Shopping list aggregation ─────────────────────────────────
+function generateShoppingList(recipes) {
+  const agg = {}; // name.toLowerCase() → { name, total, unit, category, isStock }
+
+  for (const recipe of recipes) {
+    for (const item of recipe.shopItems) {
+      const key = item.name.toLowerCase();
+      if (!agg[key]) {
+        agg[key] = { name: item.name, total: 0, unit: item.unit, category: item.category, isStock: item.qty === null };
+      }
+      if (item.qty !== null) agg[key].total += item.qty * 2; // ×2: dinner + leftover lunch
+    }
+  }
+
+  const catOrder = Object.keys(ingredientCategories);
+  const result = {};
+  for (const cat of catOrder) {
+    const label = ingredientCategories[cat];
+    const items = Object.values(agg)
+      .filter(i => i.category === cat)
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(i => ({ name: i.name, qty: fmtQty(i) }));
+    if (items.length) result[label] = items;
+  }
+  return result;
+}
+
+function fmtQty(item) {
+  if (item.isStock) return 'check stock';
+  const q = item.total, u = item.unit;
+  if (u === 'g' || u === 'ml') return `${q}${u}`;
+  if (u === 'whole')  return `× ${Math.ceil(q)}`;
+  if (u === 'cloves') return `${q} cloves`;
+  if (u === 'stalks') return `${q} stalks`;
+  if (u === 'slices') return `${q} slices`;
+  if (u === 'tbsp')   return `${q} tbsp`;
+  return `${q} ${u}`;
+}
+
+// ── Dynamic batch prep ────────────────────────────────────────
+function getDynamicBatchPrep(recipes) {
+  const steps = [];
+  const seen = new Set();
+  for (const recipe of recipes) {
+    for (const item of recipe.shopItems) {
+      const rule = batchPrepRules[item.name];
+      if (rule && !seen.has(item.name)) {
+        seen.add(item.name);
+        steps.push(rule);
+      }
+    }
+  }
+  return steps;
+}
+
 // ── State ──────────────────────────────────────────────────────
 let activeTab = 0;
 let expandedMeals = {};
 let checkedItems = JSON.parse(localStorage.getItem('jana-checked') || '{}');
 
-// ── Helpers ───────────────────────────────────────────────────
-function setTab(i)        { activeTab = i; render(); }
-function toggleMeal(key)  { expandedMeals[key] = !expandedMeals[key]; render(); }
+function setTab(i) { activeTab = i; render(); }
+
+function toggleMeal(key) { expandedMeals[key] = !expandedMeals[key]; render(); }
 
 function toggleCheck(key) {
   checkedItems[key] = !checkedItems[key];
@@ -605,19 +791,34 @@ function clearAll() {
 function render() {
   const app = document.getElementById('app');
 
-  const avgCal = Math.round(mealPlan.reduce((s, d) => s + d.totalCal, 0) / 7);
-  const avgP   = Math.round(mealPlan.reduce((s, d) => s + d.totalP,   0) / 7);
-  const avgF   = Math.round(mealPlan.reduce((s, d) => s + d.totalF,   0) / 7);
-  const avgC   = Math.round(mealPlan.reduce((s, d) => s + d.totalC,   0) / 7);
+  const plan = getActivePlan(); // 7 recipes — these are the dinners (Mon–Sun)
+  const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
-  const tabLabels = ['All Days', ...mealPlan.map(d => d.day.slice(0, 3)), '🛒 Shop', '📋 Prep'];
+  // Each day: dinner = plan[i], lunch = plan[(i+6)%7] (yesterday's dinner)
+  const weekDays = days.map((day, i) => ({
+    day,
+    dinner: plan[i],
+    lunch:  plan[(i + 6) % 7],
+    get totalCal() { return this.dinner.cal + this.lunch.cal; },
+    get totalP()   { return this.dinner.protein + this.lunch.protein; },
+    get totalF()   { return this.dinner.fat + this.lunch.fat; },
+    get totalC()   { return this.dinner.carbs + this.lunch.carbs; }
+  }));
+
+  const avgCal = Math.round(weekDays.reduce((s, d) => s + d.totalCal, 0) / 7);
+  const avgP   = Math.round(weekDays.reduce((s, d) => s + d.totalP,   0) / 7);
+  const avgF   = Math.round(weekDays.reduce((s, d) => s + d.totalF,   0) / 7);
+  const avgC   = Math.round(weekDays.reduce((s, d) => s + d.totalC,   0) / 7);
+
+  const tabLabels = ['All Days', ...days.map(d => d.slice(0, 3)), '🛒 Shop', '📋 Prep'];
   const shopIdx = tabLabels.length - 2;
   const prepIdx = tabLabels.length - 1;
 
   let html = `
     <header>
       <h1><em>Jana's</em> Weekly Meal Plan</h1>
-      <p>Gluten-free &middot; Dairy-free &middot; High protein &middot; ~1300 kcal lunch + dinner</p>
+      <p>Gluten-free &middot; Dairy-free &middot; High protein &middot; ~1300 kcal/day</p>
+      <span class="week-chip">📅 ${getWeekLabel()}</span>
     </header>
 
     <div class="macro-summary">
@@ -638,58 +839,20 @@ function render() {
   html += `</div><div class="tab-content">`;
 
   if (activeTab === shopIdx) {
-    html += renderShoppingList();
+    html += renderShoppingList(plan);
   } else if (activeTab === prepIdx) {
-    html += renderBatchPrep();
+    html += renderBatchPrep(plan);
   } else {
-    const days = activeTab === 0 ? mealPlan : [mealPlan[activeTab - 1]];
-    days.forEach((day, idx) => {
-      const realIdx = activeTab === 0 ? idx : activeTab - 1;
-      html += `
-        <div class="day-card">
-          <div class="day-header">
-            <div class="day-name">${day.day}</div>
-            <div class="day-macros">${day.totalCal} kcal &middot; ${day.totalP}g P &middot; ${day.totalF}g F &middot; ${day.totalC}g C</div>
-          </div>
-      `;
-      day.meals.forEach((meal, mealIdx) => {
-        const key = `${realIdx}-${mealIdx}`;
-        const expanded = expandedMeals[key];
-        html += `
-          <div class="meal">
-            <div class="meal-label">${meal.label}</div>
-            <div class="meal-title">
-              ${meal.title}
-              <span class="tag tag-${meal.tag}">${meal.tagLabel}</span>
-            </div>
-            <div class="meal-macros">
-              <span><strong>${meal.cal}</strong> kcal</span>
-              <span><strong>${meal.protein}g</strong> protein</span>
-              <span><strong>${meal.fat}g</strong> fat</span>
-              <span><strong>${meal.carbs}g</strong> carbs</span>
-            </div>
-            <button class="ingredients-toggle" onclick="toggleMeal('${key}')">
-              ${expanded ? '▾ Hide recipe' : '▸ Show recipe'}
-            </button>
-        `;
-        if (expanded) {
-          html += `
-            <div class="recipe-detail">
-              <h4>Ingredients</h4>
-              <ul>${meal.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
-              <h4>Method</h4>
-              <ol>${meal.steps.map(s => `<li>${s}</li>`).join('')}</ol>
-              <div class="prep-time">⏱ ${meal.time}</div>
-            </div>
-          `;
-        }
-        html += `</div>`;
-      });
-      html += `</div>`;
+    const toShow = activeTab === 0 ? weekDays : [weekDays[activeTab - 1]];
+    const startIdx = activeTab === 0 ? 0 : activeTab - 1;
+
+    toShow.forEach((dayData, localIdx) => {
+      const dayIdx = activeTab === 0 ? localIdx : startIdx;
+      html += renderDayCard(dayData, dayIdx);
     });
 
     if (activeTab === 0) {
-      html += `<div class="note">💡 <strong>Tip:</strong> On a ~1300 kcal lunch+dinner plan, protein averages ~100g from meals. If Jana trains regularly, consider adding a protein shake at breakfast (25–30g) to push daily total above 120g.</div>`;
+      html += `<div class="note">💡 <strong>Tip:</strong> Plan refreshes every Monday. Use the 🔀 swap buttons on any dinner to get a different recipe for that day — your swaps are saved for the week.</div>`;
     }
   }
 
@@ -697,16 +860,100 @@ function render() {
   app.innerHTML = html;
 }
 
-function renderShoppingList() {
+function renderDayCard(dayData, dayIdx) {
+  const { day, dinner, lunch } = dayData;
+  const totalCal = dinner.cal + lunch.cal;
+  const totalP = dinner.protein + lunch.protein;
+  const totalF = dinner.fat + lunch.fat;
+  const totalC = dinner.carbs + lunch.carbs;
+
+  let html = `
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-name">${day}</div>
+        <div class="day-macros">${totalCal} kcal &middot; ${totalP}g P &middot; ${totalF}g F &middot; ${totalC}g C</div>
+      </div>
+  `;
+
+  // ── Lunch (leftover from previous day's dinner) ──
+  const lunchKey = `${dayIdx}-lunch`;
+  const lunchExpanded = expandedMeals[lunchKey];
+  html += `
+    <div class="meal meal--leftover">
+      <div class="meal-label">Lunch &middot; yesterday's dinner</div>
+      <div class="meal-title">
+        ${lunch.title}
+        <span class="tag tag-${lunch.tag}">${lunch.tagLabel}</span>
+      </div>
+      <div class="meal-macros">
+        <span><strong>${lunch.cal}</strong> kcal</span>
+        <span><strong>${lunch.protein}g</strong> protein</span>
+        <span><strong>${lunch.fat}g</strong> fat</span>
+        <span><strong>${lunch.carbs}g</strong> carbs</span>
+      </div>
+      <div class="meal-actions">
+        <button class="ingredients-toggle" onclick="toggleMeal('${lunchKey}')">
+          ${lunchExpanded ? '▾ Hide recipe' : '▸ Show recipe'}
+        </button>
+      </div>
+  `;
+  if (lunchExpanded) html += recipeDetail(lunch);
+  html += `</div>`;
+
+  // ── Dinner (fresh cook tonight) ──
+  const dinnerKey = `${dayIdx}-dinner`;
+  const dinnerExpanded = expandedMeals[dinnerKey];
+  html += `
+    <div class="meal">
+      <div class="meal-label">Dinner &middot; cook tonight</div>
+      <div class="meal-title">
+        ${dinner.title}
+        <span class="tag tag-${dinner.tag}">${dinner.tagLabel}</span>
+      </div>
+      <div class="meal-macros">
+        <span><strong>${dinner.cal}</strong> kcal</span>
+        <span><strong>${dinner.protein}g</strong> protein</span>
+        <span><strong>${dinner.fat}g</strong> fat</span>
+        <span><strong>${dinner.carbs}g</strong> carbs</span>
+      </div>
+      <div class="meal-actions">
+        <button class="ingredients-toggle" onclick="toggleMeal('${dinnerKey}')">
+          ${dinnerExpanded ? '▾ Hide recipe' : '▸ Show recipe'}
+        </button>
+        <button class="swap-btn" onclick="swapMeal(${dayIdx})" title="Swap for a different recipe">🔀 Swap</button>
+      </div>
+  `;
+  if (dinnerExpanded) html += recipeDetail(dinner);
+  html += `</div>`;
+
+  html += `</div>`; // end day-card
+  return html;
+}
+
+function recipeDetail(recipe) {
+  return `
+    <div class="recipe-detail">
+      <h4>Ingredients</h4>
+      <ul>${recipe.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
+      <h4>Method</h4>
+      <ol>${recipe.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+      <div class="prep-time">⏱ ${recipe.time}</div>
+    </div>
+  `;
+}
+
+function renderShoppingList(plan) {
   const anyChecked = Object.values(checkedItems).some(Boolean);
+  const list = generateShoppingList(plan);
+
   let html = `
     <div class="shop-header">
-      <div class="shop-title">Shopping List</div>
+      <div class="shop-title">This Week's Shopping</div>
       ${anyChecked ? `<button class="clear-btn" onclick="clearAll()">Clear all</button>` : ''}
     </div>
   `;
 
-  Object.entries(shoppingList).forEach(([category, items]) => {
+  Object.entries(list).forEach(([category, items]) => {
     html += `<div class="shop-section"><h3>${category}</h3>`;
     items.forEach((item, i) => {
       const key = `${category}-${i}`;
@@ -725,32 +972,38 @@ function renderShoppingList() {
   return html;
 }
 
-function renderBatchPrep() {
+function renderBatchPrep(plan) {
+  const steps = getDynamicBatchPrep(plan);
+
   let html = `
     <div class="prep-header">
       <h2>Sunday Batch Prep</h2>
-      <p>~1 hour total &middot; Do steps 3, 4 &amp; 7 simultaneously in the oven</p>
+      <p>Steps tailored to this week's recipes &middot; Do oven steps simultaneously</p>
     </div>
     <div class="prep-card">
   `;
 
-  batchPrep.forEach((step, i) => {
-    html += `
-      <div class="prep-step">
-        <div class="prep-number">${i + 1}</div>
-        <div class="prep-content">
-          <h4>${step.title}</h4>
-          <p>${step.desc}</p>
-          <span class="prep-time-badge">⏱ ${step.time}</span>
+  if (steps.length === 0) {
+    html += `<p style="color:var(--text-2); font-size:0.875rem; padding: 8px 0;">No batch prep needed for this week's plan.</p>`;
+  } else {
+    steps.forEach((step, i) => {
+      html += `
+        <div class="prep-step">
+          <div class="prep-number">${i + 1}</div>
+          <div class="prep-content">
+            <h4>${step.title}</h4>
+            <p>${step.desc}</p>
+            <span class="prep-time-badge">⏱ ${step.time}</span>
+          </div>
         </div>
-      </div>
-    `;
-  });
+      `;
+    });
+  }
 
   html += `
     </div>
     <div class="note">
-      💡 <strong>Storage:</strong> Everything keeps for 4–5 days in the fridge. Use Mon–Wed prepped items fresh; from Thursday onwards you may want to freeze meatballs and extra chicken portions.
+      💡 <strong>Storage:</strong> Prepped items keep 4–5 days in the fridge. Cook dinner fresh each night, pack the leftovers straight away for the next day's lunch.
     </div>
   `;
 

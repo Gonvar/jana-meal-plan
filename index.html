@@ -712,6 +712,10 @@ function setLang(l) {
   render();
 }
 
+function toggleLang() {
+  setLang(lang === 'de' ? 'en' : 'de');
+}
+
 function localizedField(obj, key) {
   if (lang === 'de' && obj?.[`${key}_de`]) return obj[`${key}_de`];
   return obj?.[key];
@@ -1028,7 +1032,7 @@ function render() {
       <p>${t('subtitle')}</p>
       <div class="header-meta">
         <span class="week-chip">📅 ${getWeekLabel()}</span>
-        <button class="translate-btn" onclick="setLang(lang === 'de' ? 'en' : 'de')">
+        <button class="translate-btn" onclick="toggleLang()">
           ${lang === 'de' ? '🌐 Translate to English' : '🌐 Auf Deutsch'}
         </button>
       </div>

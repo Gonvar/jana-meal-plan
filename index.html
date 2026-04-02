@@ -716,6 +716,14 @@ function toggleLang() {
   setLang(lang === 'de' ? 'en' : 'de');
 }
 
+function getShopItemKey(category, name) {
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  return `shop-${category}-${slug}`;
+}
+
 function localizedField(obj, key) {
   if (lang === 'de' && obj?.[`${key}_de`]) return obj[`${key}_de`];
   return obj?.[key];
@@ -945,7 +953,11 @@ function generateShoppingList(recipes) {
     const label = cats[cat];
     const items = Object.values(agg)
       .filter(i => i.category === cat)
-      .map(i => ({ name: localizedShopItemName(i.name), qty: fmtQty(i) }))
+      .map(i => ({
+        id: getShopItemKey(cat, i.name),
+        name: localizedShopItemName(i.name),
+        qty: fmtQty(i)
+      }))
       .sort((a, b) => a.name.localeCompare(b.name, lang === 'de' ? 'de' : 'en'));
     if (items.length) result[label] = items;
   }
@@ -989,9 +1001,11 @@ function setTab(i) { activeTab = i; render(); }
 
 function toggleMeal(key) { expandedMeals[key] = !expandedMeals[key]; render(); }
 
-function toggleCheck(key) {
-  checkedItems[key] = !checkedItems[key];
+function toggleCheck(key, legacyKey) {
+  const isChecked = !!checkedItems[key] || (legacyKey ? !!checkedItems[legacyKey] : false);
+  checkedItems[key] = !isChecked;
   if (!checkedItems[key]) delete checkedItems[key];
+  if (legacyKey) delete checkedItems[legacyKey];
   localStorage.setItem('jana-checked', JSON.stringify(checkedItems));
   render();
 }
@@ -1000,6 +1014,24 @@ function clearAll() {
   checkedItems = {};
   localStorage.removeItem('jana-checked');
   render();
+}
+
+function handleAppClick(event) {
+  const actionEl = event.target.closest('button[data-action]');
+  if (!actionEl) return;
+
+  const { action } = actionEl.dataset;
+  if (action === 'toggle-lang') return toggleLang();
+  if (action === 'set-tab') return setTab(Number(actionEl.dataset.tabIndex));
+  if (action === 'toggle-meal') return toggleMeal(actionEl.dataset.mealKey);
+  if (action === 'swap-meal') return swapMeal(Number(actionEl.dataset.dayIndex));
+  if (action === 'clear-checks') return clearAll();
+}
+
+function handleAppChange(event) {
+  const input = event.target.closest('input[data-action="toggle-check"]');
+  if (!input) return;
+  toggleCheck(input.dataset.checkKey, input.dataset.legacyKey);
 }
 
 // ── Render ────────────────────────────────────────────────────
@@ -1032,7 +1064,7 @@ function render() {
       <p>${t('subtitle')}</p>
       <div class="header-meta">
         <span class="week-chip">📅 ${getWeekLabel()}</span>
-        <button class="translate-btn" onclick="toggleLang()">
+        <button type="button" class="translate-btn" data-action="toggle-lang">
           ${lang === 'de' ? '🌐 Translate to English' : '🌐 Auf Deutsch'}
         </button>
       </div>
@@ -1054,7 +1086,7 @@ function render() {
 
   tabLabels.forEach((label, i) => {
     const extra = i === shopIdx ? ' shop-tab' : i === prepIdx ? ' prep-tab' : '';
-    html += `<button class="tab${extra}${i === activeTab ? ' active' : ''}" onclick="setTab(${i})">${label}</button>`;
+    html += `<button type="button" class="tab${extra}${i === activeTab ? ' active' : ''}" data-action="set-tab" data-tab-index="${i}">${label}</button>`;
   });
 
   html += `</div><div class="tab-content">`;
@@ -1113,7 +1145,7 @@ function renderDayCard(dayData, dayIdx) {
         <span><strong>${lunch.carbs}g</strong> ${t('carbs').toLowerCase()}</span>
       </div>
       <div class="meal-actions">
-        <button class="ingredients-toggle" onclick="toggleMeal('${lunchKey}')">
+        <button type="button" class="ingredients-toggle" data-action="toggle-meal" data-meal-key="${lunchKey}">
           ${lunchExpanded ? t('hideRecipe') : t('showRecipe')}
         </button>
       </div>
@@ -1138,10 +1170,10 @@ function renderDayCard(dayData, dayIdx) {
         <span><strong>${dinner.carbs}g</strong> ${t('carbs').toLowerCase()}</span>
       </div>
       <div class="meal-actions">
-        <button class="ingredients-toggle" onclick="toggleMeal('${dinnerKey}')">
+        <button type="button" class="ingredients-toggle" data-action="toggle-meal" data-meal-key="${dinnerKey}">
           ${dinnerExpanded ? t('hideRecipe') : t('showRecipe')}
         </button>
-        <button class="swap-btn" onclick="swapMeal(${dayIdx})">${t('swap')}</button>
+        <button type="button" class="swap-btn" data-action="swap-meal" data-day-index="${dayIdx}">${t('swap')}</button>
       </div>
   `;
   if (dinnerExpanded) html += recipeDetail(dinner);
@@ -1170,19 +1202,26 @@ function renderShoppingList(plan) {
   let html = `
     <div class="shop-header">
       <div class="shop-title">${t('shopTitle')}</div>
-      ${anyChecked ? `<button class="clear-btn" onclick="clearAll()">${t('clearAll')}</button>` : ''}
+      ${anyChecked ? `<button type="button" class="clear-btn" data-action="clear-checks">${t('clearAll')}</button>` : ''}
     </div>
   `;
 
   Object.entries(list).forEach(([category, items]) => {
     html += `<div class="shop-section"><h3>${category}</h3>`;
     items.forEach((item, i) => {
-      const key = `${category}-${i}`;
-      const checked = !!checkedItems[key];
+      const legacyKey = `${category}-${i}`;
+      const checked = !!checkedItems[item.id] || !!checkedItems[legacyKey];
       html += `
         <div class="shop-item ${checked ? 'checked' : ''}">
-          <input type="checkbox" id="${key}" ${checked ? 'checked' : ''} onchange="toggleCheck('${key}')">
-          <label for="${key}">${item.name}</label>
+          <input
+            type="checkbox"
+            id="${item.id}"
+            data-action="toggle-check"
+            data-check-key="${item.id}"
+            data-legacy-key="${legacyKey}"
+            ${checked ? 'checked' : ''}
+          >
+          <label for="${item.id}">${item.name}</label>
           <span class="qty">${item.qty}</span>
         </div>
       `;
@@ -1228,6 +1267,10 @@ function renderBatchPrep(plan) {
 
   return html;
 }
+
+const app = document.getElementById('app');
+app.addEventListener('click', handleAppClick);
+app.addEventListener('change', handleAppChange);
 
 render();
 </script>

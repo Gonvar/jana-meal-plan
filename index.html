@@ -726,6 +726,83 @@ function localizedTimeLabel(time) {
     .replace(/\boven\b/g, 'Ofen');
 }
 
+const shopItemNameTranslations = {
+  de: {
+    'Asparagus': 'Spargel',
+    'Aubergine': 'Aubergine',
+    'Avocado': 'Avocado',
+    'Baby potatoes': 'Babykartoffeln',
+    'Balsamic glaze': 'Balsamico-Creme',
+    'Bell pepper': 'Paprika',
+    'Black beans (canned)': 'Schwarze Bohnen (Dose)',
+    'Bok choy': 'Pak Choi',
+    'Broccoli': 'Brokkoli',
+    'Brown rice': 'Brauner Reis',
+    'Canned tomatoes': 'Dosentomaten',
+    'Canned tuna': 'Thunfisch aus der Dose',
+    'Carrot': 'Karotte',
+    'Cashews': 'Cashews',
+    'Cauliflower': 'Blumenkohl',
+    'Cherry tomatoes': 'Kirschtomaten',
+    'Chicken breast': 'Hähnchenbrust',
+    'Chickpeas (canned)': 'Kichererbsen (Dose)',
+    'Coconut milk (light)': 'Kokosmilch (leicht)',
+    'Cod fillet': 'Kabeljaufilet',
+    'Corn kernels': 'Maiskörner',
+    'Corn tortillas': 'Maistortillas',
+    'Courgette': 'Zucchini',
+    'Cucumber': 'Gurke',
+    'Edamame (frozen)': 'Edamame (tiefgekühlt)',
+    'Eggs (free range)': 'Eier (Freiland)',
+    'Firm tofu': 'Fester Tofu',
+    'Fresh basil': 'Frisches Basilikum',
+    'Fresh coriander': 'Frischer Koriander',
+    'Fresh parsley': 'Frische Petersilie',
+    'Garlic': 'Knoblauch',
+    'Ginger (fresh)': 'Ingwer (frisch)',
+    'Gluten-free bread': 'Glutenfreies Brot',
+    'Green beans': 'Grüne Bohnen',
+    'Hummus (GF)': 'Hummus (GF)',
+    'Iceberg lettuce': 'Eisbergsalat',
+    'Kalamata olives': 'Kalamata-Oliven',
+    'Lemon': 'Zitrone',
+    'Lime': 'Limette',
+    'Maple syrup': 'Ahornsirup',
+    'Mixed salad greens': 'Gemischter Blattsalat',
+    'Olive oil': 'Olivenöl',
+    'Onion': 'Zwiebel',
+    'Peanut butter': 'Erdnussbutter',
+    'Peanuts': 'Erdnüsse',
+    'Peas (frozen)': 'Erbsen (tiefgekühlt)',
+    'Prawns (raw)': 'Garnelen (roh)',
+    'Quinoa (dry)': 'Quinoa (trocken)',
+    'Red cabbage': 'Rotkohl',
+    'Red lentils (dry)': 'Rote Linsen (trocken)',
+    'Red onion': 'Rote Zwiebel',
+    'Rice noodles': 'Reisnudeln',
+    'Rice vinegar': 'Reisessig',
+    'Rocket / arugula': 'Rucola',
+    'Salmon fillet': 'Lachsfilet',
+    'Sesame oil': 'Sesamöl',
+    'Sesame seeds': 'Sesamsamen',
+    'Silken tofu': 'Seidentofu',
+    'Spinach (baby)': 'Babyspinat',
+    'Spring onions': 'Frühlingszwiebeln',
+    'Sweet potato': 'Süßkartoffel',
+    'Tahini': 'Tahini',
+    'Tamari': 'Tamari',
+    'Turkey mince': 'Putenhackfleisch',
+    'Vegetable broth': 'Gemüsebrühe',
+    'White beans (canned)': 'Weiße Bohnen (Dose)',
+    'White miso paste': 'Weiße Misopaste',
+    'White rice': 'Weißer Reis'
+  }
+};
+
+function localizedShopItemName(name) {
+  return shopItemNameTranslations[lang]?.[name] || name;
+}
+
 // ── Week helpers ───────────────────────────────────────────────
 function getWeekSeed() {
   const d = new Date();
@@ -864,8 +941,8 @@ function generateShoppingList(recipes) {
     const label = cats[cat];
     const items = Object.values(agg)
       .filter(i => i.category === cat)
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map(i => ({ name: i.name, qty: fmtQty(i) }));
+      .map(i => ({ name: localizedShopItemName(i.name), qty: fmtQty(i) }))
+      .sort((a, b) => a.name.localeCompare(b.name, lang === 'de' ? 'de' : 'en'));
     if (items.length) result[label] = items;
   }
   return result;

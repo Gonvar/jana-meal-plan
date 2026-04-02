@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -102,6 +102,35 @@ header p {
   border: 1px solid var(--border);
   border-radius: 50px;
   padding: 4px 12px;
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.translate-btn {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 50px;
+  padding: 5px 14px;
+  cursor: pointer;
+  color: var(--text-2);
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.translate-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
 /* ── Macro Summary ── */
@@ -594,6 +623,77 @@ header p {
 
 <script src="recipes.js"></script>
 <script>
+// ── Translations ──────────────────────────────────────────────
+const translations = {
+  en: {
+    htmlLang: 'en',
+    title: 'Weekly Meal Plan',
+    subtitle: 'Gluten-free · Dairy-free · High protein · ~1300 kcal/day',
+    avgKcal: 'Avg kcal', protein: 'Protein', fat: 'Fat', carbs: 'Carbs',
+    allDays: 'All Days',
+    dayShort: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    dayFull:  ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+    lunch: 'Lunch', dinner: 'Dinner',
+    lunchSub: "yesterday's dinner", dinnerSub: 'cook tonight',
+    showRecipe: '▸ Show recipe', hideRecipe: '▾ Hide recipe',
+    swap: '🔀 Swap',
+    ingredients: 'Ingredients', method: 'Method',
+    shopTitle: "This Week's Shopping", clearAll: 'Clear all',
+    prepTitle: 'Sunday Batch Prep',
+    prepSub: "Steps tailored to this week's recipes · Do oven steps simultaneously",
+    prepEmpty: "No batch prep needed for this week's plan.",
+    tipPlan:    'Plan refreshes every Monday. Use the 🔀 swap buttons on any dinner to get a different recipe for that day — your swaps are saved for the week.',
+    tipStorage: 'Everything keeps 4–5 days in the fridge. Cook dinner fresh each night, pack the leftovers straight away for the next day\'s lunch.',
+    cats: {
+      proteins:   '🥩 Proteins',
+      vegetables: '🥬 Vegetables & Herbs',
+      grains:     '🫘 Legumes & Grains',
+      fats:       '🥑 Fats & Sauces',
+      spices:     '🧂 Spice Check'
+    }
+  },
+  de: {
+    htmlLang: 'de',
+    title: 'Wöchentlicher Mahlzeitenplan',
+    subtitle: 'Glutenfrei · Milchfrei · Proteinreich · ~1300 kcal/Tag',
+    avgKcal: 'Ø kcal', protein: 'Eiweiß', fat: 'Fett', carbs: 'KH',
+    allDays: 'Alle Tage',
+    dayShort: ['Mo','Di','Mi','Do','Fr','Sa','So'],
+    dayFull:  ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'],
+    lunch: 'Mittagessen', dinner: 'Abendessen',
+    lunchSub: 'Reste vom Vortag', dinnerSub: 'heute kochen',
+    showRecipe: '▸ Rezept anzeigen', hideRecipe: '▾ Rezept verstecken',
+    swap: '🔀 Tauschen',
+    ingredients: 'Zutaten', method: 'Zubereitung',
+    shopTitle: 'Einkaufsliste diese Woche', clearAll: 'Alle löschen',
+    prepTitle: 'Sonntagsvorbereitung',
+    prepSub: 'Auf diese Woche abgestimmt · Ofengerichte gleichzeitig zubereiten',
+    prepEmpty: 'Keine Vorbereitungen für diese Woche nötig.',
+    tipPlan:    'Der Plan wird jeden Montag aktualisiert. Mit 🔀 kann jedes Abendessen einzeln getauscht werden — Änderungen bleiben die ganze Woche gespeichert.',
+    tipStorage: 'Alles hält 4–5 Tage im Kühlschrank. Abendessen frisch kochen und die Reste direkt für das nächste Mittagessen einpacken.',
+    cats: {
+      proteins:   '🥩 Proteine',
+      vegetables: '🥬 Gemüse & Kräuter',
+      grains:     '🫘 Hülsenfrüchte & Getreide',
+      fats:       '🥑 Fette & Saucen',
+      spices:     '🧂 Gewürzcheck'
+    }
+  }
+};
+
+let lang = localStorage.getItem('jana-lang') || 'de';
+
+function t(key) {
+  return translations[lang][key] ?? translations['en'][key] ?? key;
+}
+
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('jana-lang', l);
+  document.documentElement.lang = translations[l].htmlLang;
+  render();
+}
+
 // ── Week helpers ───────────────────────────────────────────────
 function getWeekSeed() {
   const d = new Date();
@@ -609,7 +709,8 @@ function getWeekLabel() {
   monday.setDate(d.getDate() - day + 1);
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
-  const fmt = dt => dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  const locale = lang === 'de' ? 'de-DE' : 'en-GB';
+  const fmt = dt => dt.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
   return `${fmt(monday)} – ${fmt(sunday)}`;
 }
 
@@ -724,10 +825,11 @@ function generateShoppingList(recipes) {
     }
   }
 
-  const catOrder = Object.keys(ingredientCategories);
+  const cats = t('cats');
+  const catOrder = Object.keys(cats);
   const result = {};
   for (const cat of catOrder) {
-    const label = ingredientCategories[cat];
+    const label = cats[cat];
     const items = Object.values(agg)
       .filter(i => i.category === cat)
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -792,7 +894,7 @@ function render() {
   const app = document.getElementById('app');
 
   const plan = getActivePlan(); // 7 recipes — these are the dinners (Mon–Sun)
-  const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const days = t('dayFull');
 
   // Each day: dinner = plan[i], lunch = plan[(i+6)%7] (yesterday's dinner)
   const weekDays = days.map((day, i) => ({
@@ -810,26 +912,31 @@ function render() {
   const avgF   = Math.round(weekDays.reduce((s, d) => s + d.totalF,   0) / 7);
   const avgC   = Math.round(weekDays.reduce((s, d) => s + d.totalC,   0) / 7);
 
-  const tabLabels = ['All Days', ...days.map(d => d.slice(0, 3)), '🛒 Shop', '📋 Prep'];
-  const shopIdx = tabLabels.length - 2;
-  const prepIdx = tabLabels.length - 1;
-
   let html = `
     <header>
-      <h1><em>Jana's</em> Weekly Meal Plan</h1>
-      <p>Gluten-free &middot; Dairy-free &middot; High protein &middot; ~1300 kcal/day</p>
-      <span class="week-chip">📅 ${getWeekLabel()}</span>
+      <h1><em>Jana's</em> ${t('title')}</h1>
+      <p>${t('subtitle')}</p>
+      <div class="header-meta">
+        <span class="week-chip">📅 ${getWeekLabel()}</span>
+        <button class="translate-btn" onclick="setLang(lang === 'de' ? 'en' : 'de')">
+          ${lang === 'de' ? '🌐 Translate to English' : '🌐 Auf Deutsch'}
+        </button>
+      </div>
     </header>
 
     <div class="macro-summary">
-      <div class="macro-box"><div class="value">${avgCal}</div><div class="label">Avg kcal</div></div>
-      <div class="macro-box"><div class="value">${avgP}g</div><div class="label">Protein</div></div>
-      <div class="macro-box"><div class="value">${avgF}g</div><div class="label">Fat</div></div>
-      <div class="macro-box"><div class="value">${avgC}g</div><div class="label">Carbs</div></div>
+      <div class="macro-box"><div class="value">${avgCal}</div><div class="label">${t('avgKcal')}</div></div>
+      <div class="macro-box"><div class="value">${avgP}g</div><div class="label">${t('protein')}</div></div>
+      <div class="macro-box"><div class="value">${avgF}g</div><div class="label">${t('fat')}</div></div>
+      <div class="macro-box"><div class="value">${avgC}g</div><div class="label">${t('carbs')}</div></div>
     </div>
 
     <div class="tabs-wrap">
   `;
+
+  const tabLabels = [t('allDays'), ...t('dayShort'), '🛒 Shop', '📋 Prep'];
+  const shopIdx = tabLabels.length - 2;
+  const prepIdx = tabLabels.length - 1;
 
   tabLabels.forEach((label, i) => {
     const extra = label === '🛒 Shop' ? ' shop-tab' : label === '📋 Prep' ? ' prep-tab' : '';
@@ -852,7 +959,7 @@ function render() {
     });
 
     if (activeTab === 0) {
-      html += `<div class="note">💡 <strong>Tip:</strong> Plan refreshes every Monday. Use the 🔀 swap buttons on any dinner to get a different recipe for that day — your swaps are saved for the week.</div>`;
+      html += `<div class="note">💡 ${t('tipPlan')}</div>`;
     }
   }
 
@@ -880,20 +987,20 @@ function renderDayCard(dayData, dayIdx) {
   const lunchExpanded = expandedMeals[lunchKey];
   html += `
     <div class="meal meal--leftover">
-      <div class="meal-label">Lunch &middot; yesterday's dinner</div>
+      <div class="meal-label">${t('lunch')} &middot; ${t('lunchSub')}</div>
       <div class="meal-title">
         ${lunch.title}
         <span class="tag tag-${lunch.tag}">${lunch.tagLabel}</span>
       </div>
       <div class="meal-macros">
         <span><strong>${lunch.cal}</strong> kcal</span>
-        <span><strong>${lunch.protein}g</strong> protein</span>
-        <span><strong>${lunch.fat}g</strong> fat</span>
-        <span><strong>${lunch.carbs}g</strong> carbs</span>
+        <span><strong>${lunch.protein}g</strong> ${t('protein').toLowerCase()}</span>
+        <span><strong>${lunch.fat}g</strong> ${t('fat').toLowerCase()}</span>
+        <span><strong>${lunch.carbs}g</strong> ${t('carbs').toLowerCase()}</span>
       </div>
       <div class="meal-actions">
         <button class="ingredients-toggle" onclick="toggleMeal('${lunchKey}')">
-          ${lunchExpanded ? '▾ Hide recipe' : '▸ Show recipe'}
+          ${lunchExpanded ? t('hideRecipe') : t('showRecipe')}
         </button>
       </div>
   `;
@@ -905,22 +1012,22 @@ function renderDayCard(dayData, dayIdx) {
   const dinnerExpanded = expandedMeals[dinnerKey];
   html += `
     <div class="meal">
-      <div class="meal-label">Dinner &middot; cook tonight</div>
+      <div class="meal-label">${t('dinner')} &middot; ${t('dinnerSub')}</div>
       <div class="meal-title">
         ${dinner.title}
         <span class="tag tag-${dinner.tag}">${dinner.tagLabel}</span>
       </div>
       <div class="meal-macros">
         <span><strong>${dinner.cal}</strong> kcal</span>
-        <span><strong>${dinner.protein}g</strong> protein</span>
-        <span><strong>${dinner.fat}g</strong> fat</span>
-        <span><strong>${dinner.carbs}g</strong> carbs</span>
+        <span><strong>${dinner.protein}g</strong> ${t('protein').toLowerCase()}</span>
+        <span><strong>${dinner.fat}g</strong> ${t('fat').toLowerCase()}</span>
+        <span><strong>${dinner.carbs}g</strong> ${t('carbs').toLowerCase()}</span>
       </div>
       <div class="meal-actions">
         <button class="ingredients-toggle" onclick="toggleMeal('${dinnerKey}')">
-          ${dinnerExpanded ? '▾ Hide recipe' : '▸ Show recipe'}
+          ${dinnerExpanded ? t('hideRecipe') : t('showRecipe')}
         </button>
-        <button class="swap-btn" onclick="swapMeal(${dayIdx})" title="Swap for a different recipe">🔀 Swap</button>
+        <button class="swap-btn" onclick="swapMeal(${dayIdx})">${t('swap')}</button>
       </div>
   `;
   if (dinnerExpanded) html += recipeDetail(dinner);
@@ -933,9 +1040,9 @@ function renderDayCard(dayData, dayIdx) {
 function recipeDetail(recipe) {
   return `
     <div class="recipe-detail">
-      <h4>Ingredients</h4>
+      <h4>${t('ingredients')}</h4>
       <ul>${recipe.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
-      <h4>Method</h4>
+      <h4>${t('method')}</h4>
       <ol>${recipe.steps.map(s => `<li>${s}</li>`).join('')}</ol>
       <div class="prep-time">⏱ ${recipe.time}</div>
     </div>
@@ -948,8 +1055,8 @@ function renderShoppingList(plan) {
 
   let html = `
     <div class="shop-header">
-      <div class="shop-title">This Week's Shopping</div>
-      ${anyChecked ? `<button class="clear-btn" onclick="clearAll()">Clear all</button>` : ''}
+      <div class="shop-title">${t('shopTitle')}</div>
+      ${anyChecked ? `<button class="clear-btn" onclick="clearAll()">${t('clearAll')}</button>` : ''}
     </div>
   `;
 
@@ -977,14 +1084,14 @@ function renderBatchPrep(plan) {
 
   let html = `
     <div class="prep-header">
-      <h2>Sunday Batch Prep</h2>
-      <p>Steps tailored to this week's recipes &middot; Do oven steps simultaneously</p>
+      <h2>${t('prepTitle')}</h2>
+      <p>${t('prepSub')}</p>
     </div>
     <div class="prep-card">
   `;
 
   if (steps.length === 0) {
-    html += `<p style="color:var(--text-2); font-size:0.875rem; padding: 8px 0;">No batch prep needed for this week's plan.</p>`;
+    html += `<p style="color:var(--text-2); font-size:0.875rem; padding: 8px 0;">${t('prepEmpty')}</p>`;
   } else {
     steps.forEach((step, i) => {
       html += `
@@ -1002,9 +1109,7 @@ function renderBatchPrep(plan) {
 
   html += `
     </div>
-    <div class="note">
-      💡 <strong>Storage:</strong> Prepped items keep 4–5 days in the fridge. Cook dinner fresh each night, pack the leftovers straight away for the next day's lunch.
-    </div>
+    <div class="note">💡 ${t('tipStorage')}</div>
   `;
 
   return html;
